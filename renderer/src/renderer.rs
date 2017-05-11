@@ -206,12 +206,6 @@ impl VertexConstructor<tessellation::StrokeVertex, GpuStrokeVertex> for WithId<G
     }
 }
 
-pub enum SurfaceFormat {
-    RgbaU8,
-    AlphaU8,
-    Stencil,
-}
-
 pub struct RenderTarget {
     pub color: ColorTarget,
     pub depth: DepthTarget,
@@ -285,3 +279,12 @@ pub fn create_index_buffer(factory: &mut GlFactory, data: &[u16]) -> Ibo {
     use gfx::IntoIndexBuffer;
     return data.into_index_buffer(factory);
 }
+
+#[repr(C)]
+pub struct GpuBlock16([f32; 4]);
+#[repr(C)]
+pub struct GpuBlock32([f32; 8]);
+#[repr(C)]
+pub struct GpuBlock64([f32; 16]);
+#[repr(C)]
+pub struct GpuBlock128([f32; 32]);
