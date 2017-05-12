@@ -100,7 +100,7 @@ impl GpuFillPrimitive {
         color: [f32; 4],
         z_index: f32,
         local_transform: TransformId,
-        view_transform: TransformId
+        view_transform: TransformId,
     ) -> GpuFillPrimitive {
         GpuFillPrimitive {
             color: color,
@@ -123,7 +123,7 @@ impl GpuStrokePrimitive {
         color: [f32; 4],
         z_index: f32,
         local_transform: TransformId,
-        view_transform: TransformId
+        view_transform: TransformId,
     ) -> GpuStrokePrimitive {
         GpuStrokePrimitive {
             color: color,
@@ -146,27 +146,23 @@ pub type TransformId = Id<GpuTransform>;
 
 impl std::default::Default for GpuTransform {
     fn default() -> Self {
-        GpuTransform { transform: [
-            [1.0, 0.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0, 0.0],
-            [0.0, 0.0, 1.0, 0.0],
-            [0.0, 0.0, 0.0, 1.0],
-        ]}
+        GpuTransform {
+            transform: [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
+        }
     }
 }
 
 impl GpuTransform {
-    pub fn new(mat: Mat4) -> Self {
-        GpuTransform { transform: mat.to_row_arrays() }
-    }
+    pub fn new(mat: Mat4) -> Self { GpuTransform { transform: mat.to_row_arrays() } }
 
-    pub fn as_mat4(&self) -> &Mat4 {
-        unsafe { mem::transmute(self) }
-    }
+    pub fn as_mat4(&self) -> &Mat4 { unsafe { mem::transmute(self) } }
 
-    pub fn as_mut_mat4(&mut self) -> &mut Mat4 {
-        unsafe { mem::transmute(self) }
-    }
+    pub fn as_mut_mat4(&mut self) -> &mut Mat4 { unsafe { mem::transmute(self) } }
 }
 
 pub type FillPrimitiveId = Id<GpuFillPrimitive>;
@@ -224,7 +220,9 @@ pub struct GpuBufferStore<Primitive> {
 }
 
 impl<Primitive> GpuBufferStore<Primitive>
-where  Primitive: Copy + Default + gfx::traits::Pod {
+where
+    Primitive: Copy + Default + gfx::traits::Pod,
+{
     pub fn new(role: gfx::buffer::Role, usage: gfx::memory::Usage) -> Self {
         GpuBufferStore {
             buffers: Vec::new(),
@@ -245,16 +243,18 @@ where  Primitive: Copy + Default + gfx::traits::Pod {
         &mut self,
         cpu: &mut BufferStore<Primitive>,
         factory: &mut GlFactory,
-        queue: &mut CmdEncoder
+        queue: &mut CmdEncoder,
     ) {
         for i in 0..cpu.buffers.len() {
             if i >= self.buffers.len() {
-                let buffer = factory.create_buffer(
-                    PRIM_BUFFER_LEN,
-                    self.role,
-                    self.usage,
-                    gfx::memory::Bind::empty(),
-                ).unwrap();
+                let buffer = factory
+                    .create_buffer(
+                        PRIM_BUFFER_LEN,
+                        self.role,
+                        self.usage,
+                        gfx::memory::Bind::empty(),
+                    )
+                    .unwrap();
                 self.buffers.push(buffer);
             }
             queue.update_buffer(&self.buffers[i], cpu.buffers[i].as_slice(), 0).unwrap();
@@ -264,9 +264,7 @@ where  Primitive: Copy + Default + gfx::traits::Pod {
 
 impl<T> ops::Index<BufferId<T>> for GpuBufferStore<T> {
     type Output = BufferObject<T>;
-    fn index(&self, id: BufferId<T>) -> &BufferObject<T> {
-        &self.buffers[id.index()]
-    }
+    fn index(&self, id: BufferId<T>) -> &BufferObject<T> { &self.buffers[id.index()] }
 }
 
 impl<T> ops::IndexMut<BufferId<T>> for GpuBufferStore<T> {
