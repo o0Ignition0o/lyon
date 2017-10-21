@@ -310,6 +310,11 @@ pub enum LineCap {
 pub enum LineJoin {
     /// A sharp corner is to be used to join path segments.
     Miter,
+    ///  When two line segments meet at a sharp angle and a value of miter, miter-clip, or arcs has
+    ///  been specified for stroke-linejoin, it is possible for the join to extend far beyond the
+    ///  thickness of the line stroking the path. The stroke-miterlimit imposes a limit on the
+    ///  extent of the line join.
+    MiterLimit,
     /// [Not implemented] Same as a miter join, but if the miter limit is exceeded,
     /// the miter is clipped at a miter length equal to the miter limit value
     /// multiplied by the stroke width.

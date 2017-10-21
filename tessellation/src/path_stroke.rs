@@ -616,6 +616,15 @@ impl<'l, Output: 'l + GeometryBuilder<Vertex>> StrokeBuilder<'l, Output> {
                     back_vertex
                 )
             }
+            LineJoin::MiterLimit => {
+                self.tesselate_miter_limit_join(
+                    prev_tangent,
+                    next_tangent,
+                    front_side,
+                    back_vertex,
+                    4
+                )
+            }
             // Fallback to Miter for unimplemented line joins
             _ => {
                 let v = add_vertex!(
@@ -745,6 +754,29 @@ impl<'l, Output: 'l + GeometryBuilder<Vertex>> StrokeBuilder<'l, Output> {
         self.prev_normal = n * neg_if_right;
 
         (start_vertex, last_vertex)
+    }
+
+    fn tesselate_miter_limit_join(
+        &mut self,
+        prev_tangent: Vec2,
+        next_tangent: Vec2,
+        front_side: Side,
+        back_vertex: VertexId,
+        limit: u32
+    ) -> (VertexId, VertexId) {
+        let normal = get_angle_normal(prev_tangent, next_tangent);
+        let v = add_vertex!(
+            self,
+            Vertex {
+                position: self.current,
+                normal: normal,
+                advancement: self.length,
+                side: front_side,
+            }
+        );
+        self.prev_normal = normal;
+
+        (v, v)
     }
 }
 
